@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>পরীক্ষা চলছে...</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="timer-bar">
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center">
+      <span>👤 <%=student.full_name%></span>
+      <div class="timer-box" id="timer">⏱ <span id="time-display"><%=Math.floor(exam_duration/60)%>:00</span></div>
+      <span>📝 <%=exam.title%></span>
+    </div>
+  </div>
+
+  <div class="container exam-container">
+    <form action="/exam/submit" method="POST" id="exam-form">
+      <%questions.forEach((q,i)=>{
+        const keys=['a','b','c','d','e','f'].slice(0,q.num_options||4);
+      %>
+      <div class="question-card" id="qc-<%=i%>">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="q-number">প্রশ্ন <%=i+1%> / <%=questions.length%></div>
+          <button type="button" class="btn btn-sm"
+                  style="font-size:12px;background:#fff5f5;color:#c53030"
+                  onclick="openReport(<%=q.id%>,'<%=q.question.replace(/'/g,"\\'"  ).substring(0,60)%>')">
+            🚨 Report
+          </button>
+        </div>
+        <div class="q-text"><%=q.question%></div>
+        <div class="options">
+          <%keys.forEach(k=>{%>
+          <label class="option-label">
+            <input type="radio" name="q_<%=q.id%>" value="<%=k.toUpperCase()%>">
+            <span class="option-key"><%=k.toUpperCase()%></span>
+            <span class="option-text"><%=q['option_'+k]||''%></span>
+          </label>
+          <%})%>
+        </div>
+      </div>
+      <%})%>
+
+      <div class="submit-area">
+        <button type="submit" class="btn btn-primary btn-lg"
+                onclick="return confirm('পরীক্ষা জমা দেবে?')">
+          📤 পরীক্ষা জমা দাও
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Report Modal -->
+  <div id="report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:12px;padding:28px;max-width:420px;width:90%;margin:auto">
+      <h3 style="margin-bottom:12px">🚨 প্রশ্ন Report করো</h3>
+      <p id="report-q-text" style="font-size:13px;color:#666;margin-bottom:12px"></p>
+      <textarea id="report-reason" rows="3" placeholder="কেন report করছো?" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px"></textarea>
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button onclick="submitReport()" class="btn btn-primary" style="flex:1">জমা দাও</button>
+        <button onclick="closeReport()" class="btn" style="flex:1">বাতিল</button>
+      </div>
+      <p id="report-msg" style="font-size:13px;margin-top:8px;text-align:center"></p>
+    </div>
+  </div>
+
+  <script>
+    // Timer
+    let timeLeft = <%=exam_duration%>;
+    const disp = document.getElementById('time-display');
+    const tbox = document.getElementById('timer');
+    const iv = setInterval(()=>{
+      timeLeft--;
+      const m=Math.floor(timeLeft/60), s=timeLeft%60;
+      disp.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      if(timeLeft<=60) tbox.classList.add('timer-warning');
+      if(timeLeft<=0){ clearInterval(iv); document.getElementById('exam-form').submit(); }
+    },1000);
+
+    // Option highlight
+    document.querySelectorAll('.option-label').forEach(l=>{
+      l.addEventListener('click',function(){
+        const nm=this.querySelector('input').name;
+        document.querySelectorAll(`input[name="${nm}"]`).forEach(i=>i.closest('.option-label').classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+
+    // Report
+    let currentQid=null;
+    function openReport(id,text){
+      currentQid=id;
+      document.getElementById('report-q-text').textContent=text+'...';
+      document.getElementById('report-reason').value='';
+      document.getElementById('report-msg').textContent='';
+      document.getElementById('report-modal').style.display='flex';
+    }
+    function closeReport(){ document.getElementById('report-modal').style.display='none'; }
+    async function submitReport(){
+      const reason=document.getElementById('report-reason').value.trim();
+      if(reason.length<5){ document.getElementById('report-msg').textContent='কারণ আরেকটু লেখো!'; return; }
+      const r=await fetch('/exam/report-question',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({question_id:currentQid,reason})
+      });
+      const d=await r.json();
+      document.getElementById('report-msg').textContent=d.msg;
+      if(d.success) setTimeout(closeReport,1500);
+    }
+  </script>
+</body>
+</html>

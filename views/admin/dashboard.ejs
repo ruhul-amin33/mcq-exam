@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <span class="nav-brand">📋 MCQ Admin</span>
+    <div class="nav-links" style="gap:8px;flex-wrap:wrap">
+      <a href="/admin/dashboard" class="nav-item">🏠 Home</a>
+      <a href="/admin/approvals" class="nav-item">
+        👥 Approvals <% if(stats.pending>0){%><span class="badge-red"><%= stats.pending %></span><%}%>
+      </a>
+      <a href="/admin/exams"     class="nav-item">📝 Exams</a>
+      <a href="/admin/questions" class="nav-item">❓ Questions</a>
+      <a href="/admin/reports"   class="nav-item">
+        🚨 Reports <% if(stats.reports>0){%><span class="badge-red"><%= stats.reports %></span><%}%>
+      </a>
+      <a href="/admin/courses"   class="nav-item">📚 Courses</a>
+      <a href="/admin/payments"  class="nav-item">
+        💳 Payments <% if(stats.payments>0){%><span class="badge-red"><%= stats.payments %></span><%}%>
+      </a>
+      <a href="/admin/logout" class="btn btn-sm btn-danger">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <% if(success==='timer_set'){%><div class="alert alert-success">⏱ Timer সেট হয়েছে!</div><%}%>
+
+    <!-- Stat cards -->
+    <div class="stat-cards">
+      <div class="stat-card c-blue">
+        <div class="sc-icon">👥</div>
+        <div class="sc-num"><%= stats.students %></div>
+        <div class="sc-label">Students</div>
+      </div>
+      <div class="stat-card c-amber">
+        <div class="sc-icon">⏳</div>
+        <div class="sc-num"><%= stats.pending %></div>
+        <div class="sc-label">Pending Approval</div>
+      </div>
+      <div class="stat-card c-purple">
+        <div class="sc-icon">❓</div>
+        <div class="sc-num"><%= stats.questions %></div>
+        <div class="sc-label">Questions</div>
+      </div>
+      <div class="stat-card c-teal">
+        <div class="sc-icon">📝</div>
+        <div class="sc-num"><%= stats.exams %></div>
+        <div class="sc-label">Exams</div>
+      </div>
+      <div class="stat-card c-coral">
+        <div class="sc-icon">🚨</div>
+        <div class="sc-num"><%= stats.reports %></div>
+        <div class="sc-label">Pending Reports</div>
+      </div>
+      <div class="stat-card c-green">
+        <div class="sc-icon">📚</div>
+        <div class="sc-num"><%= stats.courses %></div>
+        <div class="sc-label">Courses</div>
+      </div>
+    </div>
+
+    <!-- Timer -->
+    <div class="card timer-card">
+      <h3>⏱ Default Exam Timer</h3>
+      <div class="timer-current">বর্তমান: <strong><%= currentDuration %> মিনিট</strong></div>
+      <form action="/admin/set-timer" method="POST">
+        <div class="timer-inputs">
+          <input type="number" name="duration" min="1" max="180" value="<%= currentDuration %>" style="width:110px" required>
+          <span style="color:#666;font-size:14px">মিনিট</span>
+          <button type="submit" class="btn btn-primary">সেট করো</button>
+        </div>
+        <div class="quick-times">
+          <% [5,10,15,20,30,45,60].forEach(m=>{%>
+            <button type="button" class="btn btn-sm quick-btn"
+                    onclick="document.querySelector('[name=duration]').value=<%= m %>">
+              <%= m %> মি
+            </button>
+          <%})%>
+        </div>
+      </form>
+    </div>
+
+    <div style="text-align:center;padding:20px">
+      <p style="color:#888;font-size:14px">সব manage করতে উপরের nav ব্যবহার করো।</p>
+    </div>
+  </div>
+</body>
+</html>

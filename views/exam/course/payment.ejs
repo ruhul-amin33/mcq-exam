@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head><meta charset="UTF-8"><title>Payment</title><link rel="stylesheet" href="/style.css"></head>
+<body class="auth-page">
+  <div class="auth-box" style="max-width:480px">
+    <div class="auth-logo">💳</div>
+    <h2>Course কিনুন</h2>
+    <div style="background:#f7fafc;border-radius:10px;padding:14px;margin-bottom:20px">
+      <strong><%=course.title%></strong><br>
+      <span style="font-size:20px;color:#667eea;font-weight:700">৳<%=parseFloat(course.price).toFixed(2)%></span>
+    </div>
+
+    <%if(error){%><div class="alert alert-danger"><%=error%></div><%}%>
+    <%if(success){%><div class="alert alert-success"><%=success%></div><%}%>
+
+    <%if(!success){%>
+    <form action="/course/<%=course.id%>/pay" method="POST">
+      <div class="form-group">
+        <label>Payment Method</label>
+        <select name="method" required>
+          <option value="bkash">📱 bKash</option>
+          <option value="nagad">📱 Nagad</option>
+          <option value="card">💳 Card</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Transaction ID / Reference</label>
+        <input type="text" name="transaction_ref" placeholder="যেমন: 8N7XK2QM..." required minlength="4">
+      </div>
+      <div class="alert" style="background:#fefcbf;color:#744210;border:1px solid #f6e05e;font-size:13px">
+        💡 Payment করার পর এখানে Transaction ID দাও। Admin approve করলে course unlock হবে।
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">জমা দাও</button>
+    </form>
+    <%}%>
+    <div style="text-align:center;margin-top:16px">
+      <a href="/course/<%=course.id%>">← Course এ ফিরে যাও</a>
+    </div>
+  </div>
+</body>
+</html>

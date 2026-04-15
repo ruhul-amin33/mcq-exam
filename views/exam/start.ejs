@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>পরীক্ষা — MCQ Exam</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <span class="nav-brand">📚 MCQ পরীক্ষা</span>
+    <div class="nav-links">
+      <span>👤 <%= student.full_name %></span>
+      <a href="/exam/logout" class="btn btn-sm btn-danger">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container" style="max-width:700px">
+
+    <!-- Welcome + Rank -->
+    <div class="card" style="text-align:center;padding:32px">
+      <div style="font-size:52px;margin-bottom:8px">📋</div>
+      <h2>স্বাগতম, <%= student.full_name %>!</h2>
+
+      <% if (myResults.length > 0) { %>
+        <div class="my-rank-badge">
+          🏆 তোমার বর্তমান র‍্যাঙ্ক:
+          <strong>
+            <% if (myRank === 1) { %> 🥇 ১ম
+            <% } else if (myRank === 2) { %> 🥈 ২য়
+            <% } else if (myRank === 3) { %> 🥉 ৩য়
+            <% } else { %> #<%= myRank %>
+            <% } %>
+          </strong>
+        </div>
+      <% } %>
+
+      <div class="exam-rules" style="margin:20px 0">
+        <div class="rule-item">⏱ সময় শেষ হলে স্বয়ংক্রিয়ভাবে জমা হবে</div>
+        <div class="rule-item">📝 প্রতিটি প্রশ্নে একটিই উত্তর</div>
+        <div class="rule-item">🔀 প্রশ্ন Random হবে প্রতিবার</div>
+      </div>
+
+      <% if (error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+
+
+      <% exams.forEach(e => { %>
+  <div class="card">
+    <h3><%= e.title %></h3>
+    <p>⏱ <%= e.duration_minutes %> মিনিট</p>
+
+    <form action="/exam/start" method="POST">
+      <input type="hidden" name="exam_id" value="<%= e.id %>">
+      <button class="btn btn-primary">Start Exam</button>
+    </form>
+  </div>
+<% }) %>
+
+      <!-- <form action="/exam/start" method="POST"> -->
+        <!-- <button type="submit" class="btn btn-primary btn-lg" style="width:100%"> -->
+          <!-- 🚀 পরীক্ষা শুরু করো -->
+        <!-- </button> -->
+      <!-- </form> -->
+    <!-- </div> -->
+
+    <!-- My Previous Results -->
+    <% if (myResults.length > 0) { %>
+    <div class="card">
+      <h3>📊 আমার পূর্ববর্তী ফলাফল</h3>
+      <table class="marks-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>তারিখ</th>
+            <th>স্কোর</th>
+            <th>শতাংশ</th>
+            <th>ফলাফল</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% myResults.forEach((r, i) => {
+             const pct = parseFloat(r.percentage);
+          %>
+          <tr>
+            <td style="color:#aaa"><%= i+1 %></td>
+            <td style="font-size:12px">
+              <%= new Date(r.submitted_at).toLocaleString('bn-BD', {
+                month:'short', day:'numeric',
+                hour:'2-digit', minute:'2-digit'
+              }) %>
+            </td>
+            <td><strong><%= r.score %></strong>/<%= r.total %></td>
+            <td>
+              <div class="mini-bar">
+                <div class="mini-fill"
+                     style="width:<%= pct %>%;background:<%= pct>=70?'#48bb78':pct>=40?'#f6ad55':'#fc8181' %>">
+                </div>
+                <span class="mini-label"><%= pct.toFixed(1) %>%</span>
+              </div>
+            </td>
+            <td>
+              <span class="result-verdict-badge
+                <%= pct>=70?'verdict-pass':pct>=40?'verdict-avg':'verdict-fail' %>">
+                <%= pct>=70?'✅ পাস':pct>=40?'⚠️ গড়':'❌ ফেল' %>
+              </span>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+
+  </div>
+</body>
+</html>

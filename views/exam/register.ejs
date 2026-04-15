@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head><meta charset="UTF-8"><title>Register</title><link rel="stylesheet" href="/style.css"></head>
+<body class="auth-page">
+  <div class="auth-box">
+    <div class="auth-logo">📝</div>
+    <h2>নতুন Account বানাও</h2>
+    <div class="alert" style="background:#ebf4ff;color:#2c5282;border:1px solid #bee3f8;font-size:13px;margin-bottom:16px">
+      ℹ️ Register করার পর Admin Approve করলে Login করতে পারবে।
+    </div>
+    <%if(error){%><div class="alert alert-danger"><%=error%></div><%}%>
+    <form action="/exam/register" method="POST">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" name="full_name" placeholder="Ex:Ruhul amin" required minlength="2">
+      </div>
+      <div class="form-group">
+        <label>Username <small style="color:#888">(অক্ষর, সংখ্যা, _)</small></label>
+        <input type="text" name="username" placeholder="যেমন: ruhul_123" required minlength="3" pattern="[a-zA-Z0-9_]+">
+      </div>
+      <div class="form-group">
+        <label>Password <small style="color:#888">(6+ digits)</small></label>
+        <input type="password" name="password" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label>Confirm  Password</label>
+        <input type="password" name="confirm_password" required minlength="6">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Account তৈরি করো</button>
+    </form>
+    <div class="auth-links">
+      <p>আগে account আছে? <a href="/exam/login">Login করো →</a></p>
+    </div>
+  </div>
+</body>
+</html>

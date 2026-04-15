@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head><meta charset="UTF-8"><title>Payments</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+  <%- include('_nav') %>
+  <div class="container">
+    <%if(success==='payment_approved'){%><div class="alert alert-success">✅ Payment Approved!</div><%}%>
+    <%if(success==='payment_rejected'){%><div class="alert alert-danger">❌ Payment Rejected!</div><%}%>
+    <div class="card">
+      <h3>💳 সব Payments (<%=payments.length%>)</h3>
+      <%if(!payments.length){%><p class="empty-msg">কোনো payment নেই।</p><%}else{%>
+      <div class="table-scroll">
+        <table class="students-table">
+          <thead><tr><th>Student</th><th>Course</th><th>Amount</th><th>Method</th><th>Ref</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            <%payments.forEach(p=>{%>
+            <tr>
+              <td><%=p.full_name%><br><small>@<%=p.username%></small></td>
+              <td><%=p.course_title%></td>
+              <td>৳<%=parseFloat(p.amount).toFixed(2)%></td>
+              <td><span class="status-badge status-active"><%=p.method%></span></td>
+              <td><code><%=p.transaction_ref||'—'%></code></td>
+              <td>
+                <span class="status-badge <%=p.status==='approved'?'status-active':p.status==='rejected'?'status-blocked':'status-pending'%>">
+                  <%=p.status==='approved'?'✅':p.status==='rejected'?'❌':'⏳'%> <%=p.status%>
+                </span>
+              </td>
+              <td>
+                <%if(p.status==='pending'){%>
+                <form action="/admin/payments/approve/<%=p.id%>" method="POST" style="display:inline">
+                  <button class="btn btn-sm btn-success">✅</button>
+                </form>
+                <form action="/admin/payments/reject/<%=p.id%>" method="POST" style="display:inline">
+                  <button class="btn btn-sm btn-danger">❌</button>
+                </form>
+                <%}%>
+              </td>
+            </tr>
+            <%})%>
+          </tbody>
+        </table>
+      </div>
+      <%}%>
+    </div>
+  </div>
+</body>
+</html>

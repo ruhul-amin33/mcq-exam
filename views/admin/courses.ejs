@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head><meta charset="UTF-8"><title>Courses</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+  <%- include('_nav') %>
+  <div class="container">
+    <%if(success==='course_added'){%><div class="alert alert-success">✅ Course যোগ হয়েছে!</div><%}%>
+
+    <div class="card">
+      <h3>➕ নতুন Course</h3>
+      <form action="/admin/courses/add" method="POST">
+        <div class="options-grid">
+          <div class="form-group">
+            <label>Course Title</label>
+            <input type="text" name="title" placeholder="যেমন: HSC Physics" required>
+          </div>
+          <div class="form-group">
+            <label>মূল্য (৳)</label>
+            <input type="number" name="price" value="0" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" rows="2" placeholder="Course এর বিবরণ..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Thumbnail URL (optional)</label>
+          <input type="url" name="thumbnail_url" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px">
+            <input type="checkbox" name="is_free" value="1">
+            বিনামূল্যে (Free Course)
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary">Course তৈরি করো</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>📚 সব Courses (<%= courses.length %>)</h3>
+      <div class="table-scroll">
+        <table class="students-table">
+          <thead><tr><th>Course</th><th>মূল্য</th><th>Enrolled</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            <%courses.forEach(c=>{%>
+            <tr>
+              <td>
+                <strong><%=c.title%></strong><br>
+                <small style="color:#888"><%=c.description||''%></small>
+              </td>
+              <td><%=c.is_free?'<span class="status-badge status-active">Free</span>':'৳'+parseFloat(c.price).toFixed(2)%></td>
+              <td><%=c.enrolled_count%> জন</td>
+              <td><span class="status-badge <%=c.is_published?'status-active':'status-blocked'%>">
+                <%=c.is_published?'✅ Published':'📝 Draft'%></span></td>
+              <td>
+                <a href="/admin/courses/edit/<%=c.id%>" class="btn btn-sm btn-info">✏️ Edit</a>
+                <form action="/admin/courses/toggle/<%=c.id%>" method="POST" style="display:inline">
+                  <button class="btn btn-sm <%=c.is_published?'btn-warning':'btn-success'%>">
+                    <%=c.is_published?'Unpublish':'Publish'%>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            <%})%>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

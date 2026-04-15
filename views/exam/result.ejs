@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head><meta charset="UTF-8"><title>ফলাফল</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+  <nav class="navbar">
+    <span class="nav-brand">📊 <%=exam.title%> — ফলাফল</span>
+    <a href="/exam/start" class="btn btn-sm btn-primary">আবার দাও</a>
+  </nav>
+  <div class="container" style="max-width:800px">
+
+    <div class="score-card <%=percentage>=70?'pass':'fail'%>">
+      <div class="score-emoji"><%=percentage>=70?'🎉':'😔'%></div>
+      <h2><%=student.full_name%></h2>
+      <div class="score-number"><%=score%>/<%=total%></div>
+      <div class="score-percent"><%=percentage%>%</div>
+      <div class="score-verdict">
+        <%if(percentage>=90){%>অসাধারণ! ⭐⭐⭐
+        <%}else if(percentage>=70){%>পাস! ভালো করেছো ✅
+        <%}else if(percentage>=50){%>আরো চেষ্টা করো 📖
+        <%}else{%>অনেক পড়াশোনা দরকার ❌<%}%>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:<%=percentage%>%"></div></div>
+    </div>
+
+    <div class="card">
+      <h3>📋 বিস্তারিত ফলাফল</h3>
+      <%results.forEach((r,i)=>{%>
+      <div class="result-item <%=r.is_correct?'result-correct':'result-wrong'%>">
+        <div class="result-header">
+          <span class="result-badge"><%=r.is_correct?'✅':'❌'%></span>
+          <span class="result-q"><strong>Q<%=i+1%>:</strong> <%=r.question%></span>
+        </div>
+        <div class="result-options">
+          <%r.options.forEach(opt=>{%>
+          <span class="result-opt
+            <%=r.correct_answer===opt.key?'correct-opt':''%>
+            <%=(!r.is_correct&&r.student_answer===opt.key)?'wrong-opt':''%>">
+            <%=opt.key%>. <%=opt.text%>
+            <%=r.correct_answer===opt.key?' ✅':''%>
+            <%=(!r.is_correct&&r.student_answer===opt.key)?' ❌':''%>
+          </span>
+          <%})%>
+        </div>
+        <%if(!r.is_correct){%>
+        <p class="result-note">তুমি দিয়েছিলে: <strong><%=r.student_answer%></strong> | সঠিক: <strong><%=r.correct_answer%></strong></p>
+        <%}%>
+        <%if(r.explanation){%>
+        <div class="explanation-box">
+          <strong>💡 ব্যাখ্যা:</strong> <%=r.explanation%>
+        </div>
+        <%}%>
+        <!-- Report button in result -->
+        <button type="button" class="btn btn-sm" style="font-size:11px;background:#fff5f5;color:#c53030;margin-top:6px"
+                onclick="reportQ(<%=r.id%>)">🚨 Report এই প্রশ্ন</button>
+      </div>
+      <%})%>
+    </div>
+    <div style="text-align:center;padding:20px">
+      <a href="/exam/start" class="btn btn-primary btn-lg">🔄 আবার পরীক্ষা দাও</a>
+      <a href="/course" class="btn btn-lg" style="margin-left:10px">📚 Courses দেখো</a>
+    </div>
+  </div>
+
+  <script>
+    async function reportQ(id) {
+      const reason = prompt('কেন report করছো?');
+      if (!reason || reason.trim().length < 5) return;
+      const r = await fetch('/exam/report-question', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({question_id:id, reason: reason.trim()})
+      });
+      const d = await r.json();
+      alert(d.msg);
+    }
+  </script>
+</body>
+</html>

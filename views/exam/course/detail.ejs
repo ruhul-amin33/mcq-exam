@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head><meta charset="UTF-8"><title><%=course.title%></title><link rel="stylesheet" href="/style.css"></head>
+<body>
+  <nav class="navbar">
+    <span class="nav-brand">📚 <%=course.title%></span>
+    <div class="nav-links">
+      <a href="/course" class="btn btn-sm">← Courses</a>
+      <a href="/exam/logout" class="btn btn-sm btn-danger">Logout</a>
+    </div>
+  </nav>
+  <div class="container" style="max-width:800px">
+    <%if(success==='enrolled'){%><div class="alert alert-success">✅ Enrolled হয়েছো!</div><%}%>
+
+    <div class="card">
+      <%if(course.thumbnail_url){%>
+        <img src="<%=course.thumbnail_url%>" style="width:100%;border-radius:8px;margin-bottom:16px;max-height:240px;object-fit:cover">
+      <%}%>
+      <h2><%=course.title%></h2>
+      <p style="color:#666;margin:8px 0"><%=course.description||''%></p>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
+        <span class="course-price">
+          <%=course.is_free?'<span class="status-badge status-active" style="font-size:14px">বিনামূল্যে</span>':'৳'+parseFloat(course.price).toFixed(2)%>
+        </span>
+        <%if(!isEnrolled){%>
+          <%if(course.is_free){%>
+            <form action="/course/<%=course.id%>/enroll-free" method="POST">
+              <button class="btn btn-primary">✅ এখনই Enroll করো</button>
+            </form>
+          <%}else if(hasPendingPayment){%>
+            <span class="status-badge" style="background:#fefcbf;color:#744210;padding:8px 16px">⏳ Payment pending — Admin approve করলে unlock হবে</span>
+          <%}else{%>
+            <a href="/course/<%=course.id%>/pay" class="btn btn-primary">💳 কিনতে চাই</a>
+          <%}%>
+        <%}else{%>
+          <span class="status-badge status-active" style="font-size:14px">✅ তুমি Enrolled</span>
+        <%}%>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📋 Course Contents <%=!isEnrolled?'(Preview)':''%></h3>
+      <%if(!contents.length){%>
+        <p class="empty-msg"><%=isEnrolled?'কোনো content নেই।':'Free preview নেই। Enroll করলে সব দেখবে।'%></p>
+      <%}else{%>
+      <%contents.forEach((c,i)=>{%>
+      <div class="content-item">
+        <div class="content-icon">
+          <%=c.content_type==='video'?'🎥':c.content_type==='notes'?'📄':'📝'%>
+        </div>
+        <div class="content-body">
+          <div class="content-title"><%=i+1%>. <%=c.title%></div>
+          <%if(c.content_type==='video'&&c.content_url){%>
+            <div style="margin-top:10px">
+              <iframe src="<%=c.content_url%>" width="100%" height="280"
+                      frameborder="0" allowfullscreen style="border-radius:8px"></iframe>
+            </div>
+          <%}else if(c.content_type==='notes'&&c.content_text){%>
+            <div class="notes-box"><%=c.content_text%></div>
+          <%}else if(c.content_type==='exam'&&c.exam_id){%>
+            <form action="/exam/start" method="POST" style="margin-top:8px">
+              <input type="hidden" name="exam_id" value="<%=c.exam_id%>">
+              <button type="submit" class="btn btn-sm btn-primary">📝 এই Exam দাও</button>
+            </form>
+          <%}%>
+        </div>
+      </div>
+      <%})%>
+      <%}%>
+    </div>
+  </div>
+</body>
+</html>

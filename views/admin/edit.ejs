@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Question</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <span class="nav-brand">✏️ প্রশ্ন Edit করো</span>
+    <a href="/admin/dashboard" class="btn btn-sm">← ফিরে যাও</a>
+  </nav>
+  <div class="container" style="max-width:700px">
+    <div class="card">
+      <h3>প্রশ্ন সম্পাদনা</h3>
+      <form action="/admin/edit/<%= question.id %>" method="POST">
+        <div class="form-group">
+          <label>প্রশ্ন</label>
+          <textarea name="question" rows="3" required><%= question.question %></textarea>
+        </div>
+        <div class="options-grid">
+          <div class="form-group">
+            <label>Option A</label>
+            <input type="text" name="option_a" value="<%= question.option_a %>" required>
+          </div>
+          <div class="form-group">
+            <label>Option B</label>
+            <input type="text" name="option_b" value="<%= question.option_b %>" required>
+          </div>
+          <div class="form-group">
+            <label>Option C</label>
+            <input type="text" name="option_c" value="<%= question.option_c %>" required>
+          </div>
+          <div class="form-group">
+            <label>Option D</label>
+            <input type="text" name="option_d" value="<%= question.option_d %>" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>সঠিক উত্তর</label>
+          <select name="correct_answer" required>
+            <option value="A" <%= question.correct_answer==='A'?'selected':'' %>>A</option>
+            <option value="B" <%= question.correct_answer==='B'?'selected':'' %>>B</option>
+            <option value="C" <%= question.correct_answer==='C'?'selected':'' %>>C</option>
+            <option value="D" <%= question.correct_answer==='D'?'selected':'' %>>D</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">আপডেট করো</button>
+        <a href="/admin/dashboard" class="btn">বাতিল</a>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

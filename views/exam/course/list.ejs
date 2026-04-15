@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head><meta charset="UTF-8"><title>Courses</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+  <nav class="navbar">
+    <span class="nav-brand">📚 Courses</span>
+    <div class="nav-links">
+      <a href="/exam/start" class="btn btn-sm">🏠 Home</a>
+      <a href="/exam/logout" class="btn btn-sm btn-danger">Logout</a>
+    </div>
+  </nav>
+  <div class="container">
+    <h2 style="margin-bottom:20px">📚 সব Courses</h2>
+    <%if(!courses.length){%>
+      <div class="card"><p class="empty-msg">এখনো কোনো course নেই।</p></div>
+    <%}else{%>
+    <div class="courses-grid">
+      <%courses.forEach(c=>{%>
+      <div class="course-card">
+        <%if(c.thumbnail_url){%>
+          <img src="<%=c.thumbnail_url%>" alt="<%=c.title%>" class="course-thumb">
+        <%}else{%>
+          <div class="course-thumb-placeholder">📚</div>
+        <%}%>
+        <div class="course-body">
+          <h3 class="course-title"><%=c.title%></h3>
+          <p class="course-desc"><%=c.description||''%></p>
+          <div class="course-footer">
+            <span class="course-price">
+              <%=c.is_free?'<span class="status-badge status-active">Free</span>':'৳'+parseFloat(c.price).toFixed(2)%>
+            </span>
+            <%if(c.enrolled){%>
+              <span class="status-badge status-active">✅ Enrolled</span>
+              <a href="/course/<%=c.id%>" class="btn btn-sm btn-primary">শুরু করো</a>
+            <%}else{%>
+              <a href="/course/<%=c.id%>" class="btn btn-sm btn-info">দেখো</a>
+            <%}%>
+          </div>
+        </div>
+      </div>
+      <%})%>
+    </div>
+    <%}%>
+  </div>
+</body>
+</html>

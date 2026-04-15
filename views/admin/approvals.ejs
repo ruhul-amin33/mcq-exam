@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8"><title>Student Approvals</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <%- include('_nav') %>
+  <div class="container">
+    <% const am={approved:['success','✅ Approved!'],rejected:['danger','🗑️ Rejected!'],
+        blocked:['danger','🚫 Blocked!'],unblocked:['success','🔓 Unblocked!']}; %>
+    <% if(success&&am[success]){%>
+      <div class="alert alert-<%= am[success][0] %>"><%= am[success][1] %></div>
+    <%}%>
+
+    <!-- Pending -->
+    <div class="card">
+      <h3>⏳ Pending Approval (<%= pending.length %>)</h3>
+      <%if(!pending.length){%><p class="empty-msg">কোনো pending নেই।</p><%}else{%>
+      <table class="students-table">
+        <thead><tr><th>#</th><th>নাম</th><th>Username</th><th>তারিখ</th><th>Action</th></tr></thead>
+        <tbody>
+          <%pending.forEach((s,i)=>{%>
+          <tr>
+            <td><%=i+1%></td>
+            <td><strong><%=s.full_name%></strong></td>
+            <td><code><%=s.username%></code></td>
+            <td style="font-size:12px;color:#888"><%=new Date(s.created_at).toLocaleDateString('bn-BD')%></td>
+            <td>
+              <form action="/admin/approve/<%=s.id%>" method="POST" style="display:inline">
+                <button class="btn btn-sm btn-success">✅ Approve</button>
+              </form>
+              <form action="/admin/reject/<%=s.id%>" method="POST" style="display:inline"
+                    onsubmit="return confirm('Reject করবে?')">
+                <button class="btn btn-sm btn-danger">❌ Reject</button>
+              </form>
+            </td>
+          </tr>
+          <%})%>
+        </tbody>
+      </table>
+      <%}%>
+    </div>
+
+    <!-- Approved -->
+    <div class="card">
+      <h3>✅ Approved Students (<%= approved.length %>)</h3>
+      <%if(!approved.length){%><p class="empty-msg">কেউ নেই।</p><%}else{%>
+      <div class="table-scroll">
+        <table class="students-table">
+          <thead><tr><th>#</th><th>নাম</th><th>Username</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            <%approved.forEach((s,i)=>{%>
+            <tr class="<%=s.is_blocked?'row-blocked':''%>">
+              <td><%=i+1%></td>
+              <td><strong><%=s.full_name%></strong></td>
+              <td><code><%=s.username%></code></td>
+              <td>
+                <span class="status-badge <%=s.is_blocked?'status-blocked':'status-active'%>">
+                  <%=s.is_blocked?'🚫 Blocked':'✅ Active'%>
+                </span>
+              </td>
+              <td>
+                <a href="/admin/student-marks/<%=s.id%>" class="btn btn-sm btn-info">📊</a>
+                <form action="/admin/toggle-block/<%=s.id%>" method="POST" style="display:inline"
+                      onsubmit="return confirm('<%=s.is_blocked?'Unblock':'Block'%> করবে?')">
+                  <button class="btn btn-sm <%=s.is_blocked?'btn-success':'btn-warning'%>">
+                    <%=s.is_blocked?'🔓':'🔒'%>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            <%})%>
+          </tbody>
+        </table>
+      </div>
+      <%}%>
+    </div>
+  </div>
+</body>
+</html>

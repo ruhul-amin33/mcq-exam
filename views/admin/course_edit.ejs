@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head><meta charset="UTF-8"><title>Edit Course</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+  <%- include('_nav') %>
+  <div class="container" style="max-width:800px">
+    <%if(success==='content_added'){%><div class="alert alert-success">✅ Content যোগ হয়েছে!</div><%}%>
+
+    <div class="card">
+      <h3>📚 <%= course.title %></h3>
+      <p style="color:#666"><%=course.description||''%> | মূল্য: <%=course.is_free?'Free':'৳'+parseFloat(course.price).toFixed(2)%></p>
+    </div>
+
+    <!-- Add Content -->
+    <div class="card">
+      <h3>➕ Content যোগ করো</h3>
+      <form action="/admin/courses/<%=course.id%>/content/add" method="POST" id="cnt-form">
+        <div class="options-grid">
+          <div class="form-group">
+            <label>Content Type</label>
+            <select name="content_type" id="cnt-type" onchange="toggleType(this.value)">
+              <option value="video">🎥 Video</option>
+              <option value="notes">📄 Notes</option>
+              <option value="exam">📝 MCQ Exam</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" name="title" placeholder="Content এর নাম" required>
+          </div>
+        </div>
+        <div id="video-field" class="form-group">
+          <label>Video URL (YouTube embed বা direct)</label>
+          <input type="url" name="content_url" placeholder="https://youtube.com/embed/...">
+        </div>
+        <div id="notes-field" class="form-group" style="display:none">
+          <label>Notes (HTML/Text)</label>
+          <textarea name="content_text" rows="6" placeholder="Notes লেখো..."></textarea>
+        </div>
+        <div id="exam-field" class="form-group" style="display:none">
+          <label>Exam বেছে নাও</label>
+          <select name="exam_id">
+            <option value="">-- Exam --</option>
+            <%exams.forEach(e=>{%><option value="<%=e.id%>"><%=e.title%></option><%})%>
+          </select>
+        </div>
+        <div class="options-grid">
+          <div class="form-group">
+            <label>Sort Order</label>
+            <input type="number" name="sort_order" value="0">
+          </div>
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:8px;margin-top:28px">
+              <input type="checkbox" name="is_free_preview" value="1">
+              Free Preview (বিনামূল্যে দেখা যাবে)
+            </label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Content যোগ করো</button>
+      </form>
+    </div>
+
+    <!-- Contents List -->
+    <div class="card">
+      <h3>📋 Contents (<%=contents.length%>টি)</h3>
+      <%if(!contents.length){%><p class="empty-msg">কোনো content নেই।</p><%}else{%>
+      <%contents.forEach(c=>{%>
+      <div class="question-item">
+        <div class="q-header">
+          <span class="q-num" style="background:<%=c.content_type==='video'?'#fc8181':c.content_type==='notes'?'#48bb78':'#667eea'%>">
+            <%=c.content_type==='video'?'🎥':c.content_type==='notes'?'📄':'📝'%>
+          </span>
+          <span class="q-text"><strong><%=c.title%></strong></span>
+          <%if(c.is_free_preview){%><span class="status-badge status-active" style="font-size:11px">Free</span><%}%>
+        </div>
+        <div class="q-actions">
+          <form action="/admin/courses/content/delete/<%=c.id%>" method="POST" style="display:inline"
+                onsubmit="return confirm('মুছবে?')">
+            <button class="btn btn-sm btn-danger">🗑️ Delete</button>
+          </form>
+        </div>
+      </div>
+      <%})%>
+      <%}%>
+    </div>
+    <div style="padding-bottom:30px">
+      <a href="/admin/courses" class="btn">← Courses</a>
+    </div>
+  </div>
+  <script>
+    function toggleType(v) {
+      document.getElementById('video-field').style.display = v==='video' ? 'block' : 'none';
+      document.getElementById('notes-field').style.display = v==='notes' ? 'block' : 'none';
+      document.getElementById('exam-field').style.display  = v==='exam'  ? 'block' : 'none';
+    }
+  </script>
+</body>
+</html>

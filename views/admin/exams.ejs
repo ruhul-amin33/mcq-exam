@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head><meta charset="UTF-8"><title>Exams</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+  <%- include('_nav') %>
+  <div class="container">
+    <%if(success==='exam_added'){%><div class="alert alert-success">✅ Exam যোগ হয়েছে!</div><%}%>
+    <%if(success==='exam_deleted'){%><div class="alert alert-danger">🗑️ Exam মুছেছে!</div><%}%>
+
+    <!-- Add Exam -->
+    <div class="card">
+      <h3>➕ নতুন Exam তৈরি করো</h3>
+      <form action="/admin/exams/add" method="POST">
+        <div class="options-grid">
+          <div class="form-group">
+            <label>Exam Title</label>
+            <input type="text" name="title" placeholder="যেমন: Biology Final" required>
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select name="exam_type" id="exam_type" onchange="togglePrivate(this.value)">
+              <option value="public">🌐 Public (সবার জন্য)</option>
+              <option value="private">🔒 Private (নির্দিষ্ট Student)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Duration (মিনিট)</label>
+            <input type="number" name="duration_minutes" value="10" min="1" max="180">
+          </div>
+          <div class="form-group">
+            <label>প্রশ্ন সংখ্যা</label>
+            <input type="number" name="total_questions" value="10" min="1" max="100">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description (optional)</label>
+          <textarea name="description" rows="2" placeholder="পরীক্ষার বিবরণ..."></textarea>
+        </div>
+        <div class="form-group" id="private-students" style="display:none">
+          <label>Allowed Students (Private এর জন্য)</label>
+          <select name="allowed_students" multiple style="height:150px">
+            <%students.forEach(s=>{%>
+              <option value="<%=s.id%>"><%=s.full_name%> (@<%=s.username%>)</option>
+            <%})%>
+          </select>
+          <small style="color:#888">Ctrl/Cmd চেপে একাধিক select করো</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Exam তৈরি করো</button>
+      </form>
+    </div>
+
+    <!-- Exams List -->
+    <div class="card">
+      <h3>📝 সব Exams (<%= exams.length %>)</h3>
+      <%if(!exams.length){%><p class="empty-msg">কোনো exam নেই।</p><%}else{%>
+      <div class="table-scroll">
+        <table class="students-table">
+          <thead><tr><th>Title</th><th>Type</th><th>Duration</th><th>Questions</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            <%exams.forEach(e=>{%>
+            <tr>
+              <td><strong><%=e.title%></strong><br><small style="color:#888"><%=e.description||''%></small></td>
+              <td><span class="status-badge <%=e.exam_type==='public'?'status-active':'status-blocked'%>">
+                <%=e.exam_type==='public'?'🌐 Public':'🔒 Private'%></span></td>
+              <td><%=e.duration_minutes%> মিনিট</td>
+              <td><%=e.q_count%>/<%=e.total_questions%></td>
+              <td><span class="status-badge <%=e.is_active?'status-active':'status-blocked'%>">
+                <%=e.is_active?'✅ Active':'⏸ Inactive'%></span></td>
+              <td>
+                <form action="/admin/exams/toggle/<%=e.id%>" method="POST" style="display:inline">
+                  <button class="btn btn-sm <%=e.is_active?'btn-warning':'btn-success'%>">
+                    <%=e.is_active?'⏸':'▶️'%>
+                  </button>
+                </form>
+                <form action="/admin/exams/delete/<%=e.id%>" method="POST" style="display:inline"
+                      onsubmit="return confirm('মুছবে?')">
+                  <button class="btn btn-sm btn-danger">🗑️</button>
+                </form>
+              </td>
+            </tr>
+            <%})%>
+          </tbody>
+        </table>
+      </div>
+      <%}%>
+    </div>
+  </div>
+  <script>
+    function togglePrivate(v) {
+      document.getElementById('private-students').style.display = v==='private' ? 'block' : 'none';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head><meta charset="UTF-8"><title>Reports</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+  <%- include('_nav') %>
+  <div class="container">
+    <%if(success==='resolved'){%><div class="alert alert-success">✅ Resolved!</div><%}%>
+    <%if(success==='dismissed'){%><div class="alert alert-warning">⚠️ Dismissed!</div><%}%>
+
+    <div class="card">
+      <h3>🚨 Question Reports (<%= reports.length %>)</h3>
+      <%if(!reports.length){%><p class="empty-msg">কোনো report নেই।</p><%}else{%>
+      <div class="questions-list">
+        <%reports.forEach(r=>{%>
+        <div class="question-item" style="border-left:3px solid <%=r.status==='pending'?'#fc8181':r.status==='resolved'?'#48bb78':'#f6ad55'%>">
+          <div class="q-header">
+            <span class="q-num" style="background:<%=r.status==='pending'?'#fc8181':r.status==='resolved'?'#48bb78':'#f6ad55'%>">
+              <%=r.status==='pending'?'⏳':r.status==='resolved'?'✅':'⚠️'%>
+            </span>
+            <span class="q-text"><%=r.question%></span>
+          </div>
+          <div style="margin:8px 0;font-size:14px">
+            <strong>কারণ:</strong> <%=r.reason%>
+          </div>
+          <div style="font-size:12px;color:#888;margin-bottom:10px">
+            👤 <%=r.full_name%> (@<%=r.username%>) — <%=new Date(r.reported_at).toLocaleString('bn-BD')%>
+          </div>
+          <%if(r.status==='pending'){%>
+          <div class="q-actions">
+            <form action="/admin/reports/resolve/<%=r.id%>" method="POST" style="display:inline">
+              <button class="btn btn-sm btn-success">✅ Resolved</button>
+            </form>
+            <form action="/admin/reports/dismiss/<%=r.id%>" method="POST" style="display:inline">
+              <button class="btn btn-sm btn-warning">⚠️ Dismiss</button>
+            </form>
+          </div>
+          <%}%>
+        </div>
+        <%})%>
+      </div>
+      <%}%>
+    </div>
+  </div>
+</body>
+</html>

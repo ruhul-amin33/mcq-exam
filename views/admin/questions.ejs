@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head><meta charset="UTF-8"><title>Questions</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+  <%- include('_nav') %>
+  <div class="container">
+    <%const am2={added:'✅ যোগ হয়েছে!',updated:'✏️ আপডেট হয়েছে!',deleted:'🗑️ মুছেছে!'};%>
+    <%if(success&&am2[success]){%><div class="alert alert-success"><%=am2[success]%></div><%}%>
+
+    <!-- Add Question -->
+    <div class="card">
+      <h3>➕ নতুন প্রশ্ন</h3>
+      <form action="/admin/questions/add" method="POST" id="q-form">
+        <div class="options-grid">
+          <div class="form-group">
+            <label>Exam বেছে নাও</label>
+            <select name="exam_id" required>
+              <option value="">-- Exam --</option>
+              <%exams.forEach(e=>{%><option value="<%=e.id%>"><%=e.title%></option><%})%>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Options সংখ্যা</label>
+            <select name="num_options" id="num_opts" onchange="renderOpts(this.value)">
+              <option value="2">2 টি</option>
+              <option value="3">3 টি</option>
+              <option value="4" selected>4 টি</option>
+              <option value="5">5 টি</option>
+              <option value="6">6 টি</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>প্রশ্ন</label>
+          <textarea name="question" rows="3" placeholder="প্রশ্নটি লেখো..." required></textarea>
+        </div>
+        <div id="opts-container" class="options-grid"></div>
+        <div class="options-grid" style="margin-top:12px">
+          <div class="form-group">
+            <label>সঠিক উত্তর</label>
+            <select name="correct_answer" id="correct_ans" required>
+              <option value="">--</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Explanation (optional)</label>
+            <textarea name="explanation" rows="2" placeholder="ব্যাখ্যা লেখো..."></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">প্রশ্ন যোগ করো</button>
+      </form>
+    </div>
+
+    <!-- Questions List -->
+    <div class="card">
+      <h3>📋 সব প্রশ্ন (<%=questions.length%>টি)</h3>
+      <%if(!questions.length){%><p class="empty-msg">কোনো প্রশ্ন নেই।</p><%}else{%>
+      <div class="questions-list">
+        <%questions.forEach((q,i)=>{
+          const keys=['a','b','c','d','e','f'].slice(0,q.num_options||4);
+        %>
+        <div class="question-item">
+          <div class="q-header">
+            <span class="q-num">Q<%=i+1%></span>
+            <span class="q-text"><%=q.question%></span>
+            <span class="q-answer">✅ <%=q.correct_answer%></span>
+          </div>
+          <div class="q-options">
+            <%keys.forEach(k=>{%>
+              <span class="<%=q.correct_answer===k.toUpperCase()?'correct-opt':''%>">
+                <%=k.toUpperCase()%>. <%=q['option_'+k]||''%>
+              </span>
+            <%})%>
+          </div>
+          <%if(q.explanation){%>
+            <div class="explanation-preview">💡 <%=q.explanation%></div>
+          <%}%>
+          <div style="font-size:12px;color:#aaa;margin-bottom:8px">Exam: <%=q.exam_title||'—'%></div>
+          <div class="q-actions">
+            <a href="/admin/questions/edit/<%=q.id%>" class="btn btn-sm btn-warning">✏️ Edit</a>
+            <form action="/admin/questions/delete/<%=q.id%>" method="POST" style="display:inline"
+                  onsubmit="return confirm('মুছবে?')">
+              <button class="btn btn-sm btn-danger">🗑️</button>
+            </form>
+          </div>
+        </div>
+        <%})%>
+      </div>
+      <%}%>
+    </div>
+  </div>
+
+  <script>
+    const KEYS = ['A','B','C','D','E','F'];
+    function renderOpts(n) {
+      n = parseInt(n);
+      const c = document.getElementById('opts-container');
+      const s = document.getElementById('correct_ans');
+      c.innerHTML = '';
+      s.innerHTML = '<option value="">--</option>';
+      for (let i = 0; i < n; i++) {
+        const k = KEYS[i];
+        c.innerHTML += `
+          <div class="form-group">
+            <label>Option ${k}</label>
+            <input type="text" name="option_${k.toLowerCase()}" placeholder="Option ${k}" required>
+          </div>`;
+        s.innerHTML += `<option value="${k}">${k}</option>`;
+      }
+    }
+    renderOpts(4);
+  </script>
+</body>
+</html>
