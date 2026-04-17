@@ -1,16 +1,17 @@
+
+
 {
   "name": "mcq-exam",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
-  "type": "commonjs",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "type": "commonjs",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "ejs": "^5.0.2",
